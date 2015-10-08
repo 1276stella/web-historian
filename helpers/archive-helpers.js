@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
-
+var request = require('request');
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -55,23 +55,65 @@ exports.addUrlToList = function(url, func){
 };
 
 exports.isUrlArchived = function(url, func){
-  fs.readFile(exports.paths.archivedSites + '/' + url, 'utf8', function (err, data) {
-    if(err) {
-      if(func) {
-        func.call(this, false);
-      }
-      return false;
-    } else {
-      if(func) {
-        func.call(this, true);
-      }
-      return true;
+  // var flag = false;
+  // fs.readFile(exports.paths.archivedSites + '/' + url, 'utf8', function (err, data) {
+  //   // console.log('err', err);
+  //   if(err) {
+  //     if(func) {
+  //       func.call(this, false);
+  //     }
+  //   } else {
+  //     if(func) {
+  //       func.call(this, true);
+  //     }
+  //     flag = true;
+  //   }
+  // });
+  // console.log('flag', flag);
+  // return flag;
+  var lists = fs.readdirSync(exports.paths.archivedSites);
+  if(lists.indexOf(url) !== -1) {
+    if(func) {
+      func.call(this, true)
     }
-  });
+  } else {
+    if(func) {
+      func.call(this, false);
+    }
+  }
+  return lists.indexOf(url) > -1;
 };
 
 exports.downloadUrls = function(url){
-  for(var i = 0; i < url.length; i++) {
-    fs.writeFileSync(exports.paths.archivedSites + '/' + url[i], '');
+  for(var i = 0; i < url.length - 1; i++) {
+    exports.isUrlArchived(url[i], function(exists){
+      if(!exists) {
+        var currentUrl = url[i];
+        request('http://' + currentUrl, function(error, response, body){
+          console.log('My url: ', currentUrl);
+          console.log('My error: ', error);
+          console.log('My statusCode: ',response.statusCode); 
+          if(!error && response.statusCode == 200) {
+            fs.writeFileSync(exports.paths.archivedSites + '/' + currentUrl, body);
+          }
+        })
+      }
+    });    
+ 
   }
+  // for(var i = 0; i < url.length - 2; i++) {
+  //   // fs.writeFileSync(exports.paths.archivedSites + '/' + url[i], '');
+  //   console.log('url[i]', url[i]);
+    
+  //   var currentUrl = url[i];
+  //   request('http://' + currentUrl, function(error, response, body){
+  //     console.log('error', error);
+  //     console.log('statusCode',response.statusCode);
+  //     if(!error && response.statusCode == 200) {
+  //       console.log('url', currentUrl);
+  //       fs.writeFileSync(exports.paths.archivedSites + '/' + currentUrl, body);
+  //     }
+  //   })
+  // }
+
 };
