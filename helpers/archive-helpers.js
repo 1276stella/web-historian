@@ -25,17 +25,53 @@ exports.initialize = function(pathsObj){
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(){
+exports.readListOfUrls = function(func){
+  var data = fs.readFileSync(exports.paths.list, 'utf8');
+  var result = data.split('\n');
+  if(func) {
+    func.call(this, result);
+  }
+  return result;
 };
 
-exports.isUrlInList = function(){
+// check if the input url is in site.txt
+exports.isUrlInList = function(url, func){
+  var result = exports.readListOfUrls();
+  var flag = false;
+  if(result.indexOf(url) !== -1) {
+    flag = true;
+  }
+  if(func) {
+    func.call(this, flag);
+  }
+  return flag;
 };
 
-exports.addUrlToList = function(){
+exports.addUrlToList = function(url, func){
+  fs.appendFileSync(exports.paths.list, url + '\n', 'utf8');
+  if(func) {
+    func.call(this);
+  }
 };
 
-exports.isUrlArchived = function(){
+exports.isUrlArchived = function(url, func){
+  fs.readFile(exports.paths.archivedSites + '/' + url, 'utf8', function (err, data) {
+    if(err) {
+      if(func) {
+        func.call(this, false);
+      }
+      return false;
+    } else {
+      if(func) {
+        func.call(this, true);
+      }
+      return true;
+    }
+  });
 };
 
-exports.downloadUrls = function(){
+exports.downloadUrls = function(url){
+  for(var i = 0; i < url.length; i++) {
+    fs.writeFileSync(exports.paths.archivedSites + '/' + url[i], '');
+  }
 };
