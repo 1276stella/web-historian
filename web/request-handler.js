@@ -57,7 +57,8 @@ exports.handleRequest = function (req, res) {
         }
       } else {
         //render the requested archived page
-        fs.readFile(archive.paths.siteAssets + '/' + requrl, function(err, data) {
+        console.log('Inside says hello');
+        fs.readFile(archive.paths.archivedSites + '/' + requrl, function(err, data) {
           res.writeHead(statusCode,httpHelpers.headers);
           res.end(data);
         })
