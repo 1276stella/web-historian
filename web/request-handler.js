@@ -65,9 +65,9 @@ var poster = function(req, res) {
           res.end(data);
         })
       } else { // if the url is not archived
-        var urls = archive.readListOfUrls(); 
-          console.log('urls', urls);
-        archive.downloadUrls(urls);
+        // var urls = archive.readListOfUrls(); 
+        //   console.log('urls', urls);
+        // archive.downloadUrls(urls);
         //render loading page if it is not archived.
         fs.readFile(archive.paths.siteAssets + '/loading.html', function(err, data) {  
           res.end(data);

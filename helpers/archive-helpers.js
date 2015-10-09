@@ -92,7 +92,7 @@ exports.downloadUrls = function(url){
         request('http://' + currentUrl, function(error, response, body){
           console.log('My url: ', currentUrl);
           console.log('My error: ', error);
-          console.log('My statusCode: ',response.statusCode); 
+          // console.log('My statusCode: ',response.statusCode); 
           if(!error && response.statusCode == 200) {
             fs.writeFileSync(exports.paths.archivedSites + '/' + currentUrl, body);
           }
